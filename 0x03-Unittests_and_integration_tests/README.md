@@ -1,31 +1,65 @@
-# 0x03. Unittests and Integration Tests
-Alx project to demonstrate how to write unit and integration tests using the python unit testing framework and mock object library.
-- Unit testing is the process of testing that a particular function returns expected results for different set of inputs.
-- Integration tests aim to test a code path end-to-end. In general, only low level functions that make external calls such as HTTP requests, file I/O, database I/O, etc. are mocked.
-## Learning Objectives
-At the end of this project, you are expected to be able to explain to anyone, without the help of Google:
+# Unit Testing: `test_utils.py`
 
-- The difference between unit and integration tests.
-- Common testing patterns such as mocking, parametrizations and fixtures
-## Resources
-- [unittest — Unit testing framework](https://docs.python.org/3/library/unittest.html)
-- [unittest.mock — mock object library](https://docs.python.org/3/library/unittest.mock.html)
-- [How to mock a readonly property with mock?](https://stackoverflow.com/questions/11836436/how-to-mock-a-readonly-property-with-mock)
-- [parameterized](https://stackoverflow.com/questions/11836436/how-to-mock-a-readonly-property-with-mock)
-- [Memoization](https://en.wikipedia.org/wiki/Memoization)
-## Requirements
-- All your files will be interpreted/compiled on Ubuntu 18.04 LTS using python3 (version 3.7)
-- All your files should end with a new line
-- The first line of all your files should be exactly #!/usr/bin/env python3
-- A README.md file, at the root of the folder of the project, is mandatory
-- Your code should use the pycodestyle style (version 2.5)
-- All your files must be executable
-- All your modules should have a documentation `(python3 -c 'print(__import__("my_module").__doc__)')`
-- All your classes should have a documentation `(python3 -c 'print(__import__("my_module").MyClass.__doc__)')`
-- All your functions (inside and outside a class) should have a documentation `(python3 -c 'print(__import__("my_module").my_function.__doc__)' and python3 -c 'print(__import__("my_module").MyClass.my_function.__doc__)')`
-- A documentation is not a simple word, it’s a real sentence explaining what’s the purpose of the module, class or method (the - length of it will be verified)
-- All your functions and coroutines must be type-annotated.
-## :pencil: **Author**
-### :man: Yidnekachew Bantrga
-- [Github](https://github.com/Yidne21)
-- [Linkedin](https://www.linkedin.com/in/yidnekachew-bantrga-801376234/)
+This project contains unit tests for the `access_nested_map` function defined in `utils.py`. It is part of the `0x03-Unittests_and_integration_tests` module of the ALX Backend Python curriculum.
+
+## 📁 Directory Structure
+
+alx-backend-python/
+└── 0x03-Unittests_and_integration_tests/
+├── utils.py
+├── test_utils.py
+└── pycache/
+
+alx-backend-python/
+└── 0x03-Unittests_and_integration_tests/
+    ├── utils.py
+    ├── test_utils.py
+    └── __pycache__/
+
+
+## 🧪 Purpose
+
+- To test the behavior of the `access_nested_map` function using the `unittest` framework and `parameterized` library.
+- To cover:
+  - Valid nested key access.
+  - Exceptions raised when keys are missing (`KeyError`).
+
+## ✅ Tests Included
+
+### `test_access_nested_map`
+Checks if `access_nested_map` correctly returns the value from nested maps.
+
+**Example Cases:**
+- `({"a": 1}, ("a",)) → 1`
+- `({"a": {"b": 2}}, ("a", "b")) → 2`
+
+### `test_access_nested_map_exception`
+Ensures that a `KeyError` is raised when a key in the path is missing.
+
+**Example Cases:**
+- `({}, ("a",)) → KeyError: 'a'`
+- `({"a": {"b": 2}}, ("a", "c")) → KeyError: 'c'`
+
+## 🧰 How to Run the Tests
+
+From the `0x03-Unittests_and_integration_tests` directory:
+
+```bash
+# Using unittest discovery
+python -m unittest test_utils.py
+
+# Or run directly
+python test_utils.py
+```
+
+## 🧩 Dependenciesencies
+- Python 3.7+
+- `parameterized` package
+- Install via pip if not available:
+
+```bash
+pip install parameterized
+```
+## 📎 Related Files
+- `utils.py`: Contains the access_nested_map function.
+- `test_utils.py`: Contains all unit tests.
