@@ -80,18 +80,21 @@ class TestGithubOrgClient(unittest.TestCase):
             )
 
 
-@parameterized_class([{
-    "org_payload": org_payload,
-    "repos_payload": repos_payload,
-    "expected_repos": expected_repos,
-    "apache2_repos": apache2_repos
-}])
+@parameterized_class([
+    {
+        "org_payload": org_payload,
+        "repos_payload": repos_payload,
+        "expected_repos": expected_repos,
+        "apache2_repos": apache2_repos,
+    }
+])
 class TestIntegrationGithubOrgClient(unittest.TestCase):
     """Integration tests for GithubOrgClient.public_repos."""
 
     @classmethod
     def setUpClass(cls):
-        cls.get_patcher = patch("utils.requests.get")
+        """Set up mock for requests.get"""
+        cls.get_patcher = patch("requests.get")
         mock_get = cls.get_patcher.start()
 
         def side_effect(url):
@@ -109,6 +112,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        """Stop patcher"""
         cls.get_patcher.stop()
 
     def test_public_repos(self):
@@ -120,7 +124,6 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         """Test public_repos with license filter returns correct repos."""
         client = GithubOrgClient("google")
         self.assertEqual(client.public_repos("apache-2.0"), self.apache2_repos)
-
-
+        
 if __name__ == "__main__":
     unittest.main()
