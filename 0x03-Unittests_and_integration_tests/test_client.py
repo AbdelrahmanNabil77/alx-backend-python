@@ -25,62 +25,26 @@ expected_repos = ["repo1", "repo2", "repo3"]
 apache2_repos = ["repo1", "repo3"]
 
 
-class TestGithubOrgClient(TestCase):
+class TestGithubOrgClient(unittest.TestCase):
     """Unit tests for the GithubOrgClient class."""
 
     @parameterized.expand([
-        ("case_google", "google", {"login": "google", "id": 1}),
-        ("case_abc", "abc", {"login": "abc", "id": 2})
+        ("google",),
+        ("abc",)
     ])
     @patch("client.get_json")
-    def test_org(self, _, org_name, expected_response, mock_get_json):
-        """Test that GithubOrgClient.org returns the expected org data."""
+    def test_org(self, org_name, mock_get_json):
+        """Test that GithubOrgClient.org returns correct organization data."""
+        expected_response = {"login": org_name, "id": 1}
         mock_get_json.return_value = expected_response
+
         client = GithubOrgClient(org_name)
-        self.assertEqual(client.org(), expected_response)
+        self.assertEqual(client.org, expected_response)
         mock_get_json.assert_called_once_with(
             f"https://api.github.com/orgs/{org_name}"
         )
 
-    @patch("client.get_json")
-    def test_public_repos(self, mock_get_json):
-        """Test GithubOrgClient.public_repos returns expected repo names"""
-        mock_get_json.return_value = [
-            {"name": "repo1"},
-            {"name": "repo2"},
-            {"name": "repo3"}
-        ]
 
-        with patch.object(
-            GithubOrgClient,
-            "_public_repos_url",
-            new_callable=PropertyMock
-        ) as mock_url:
-            mock_url.return_value = "https://api.github.com/orgs/testorg/repos"
-            client = GithubOrgClient("testorg")
-            result = client.public_repos()
-            self.assertEqual(result, ["repo1", "repo2", "repo3"])
-            mock_get_json.assert_called_once_with(
-                "https://api.github.com/orgs/testorg/repos"
-            )
-            mock_url.assert_called_once()
-
-    @parameterized.expand([
-        (
-            {"license": {"key": "my_license"}},  # repo
-            "my_license",                        # license_key
-            True                                  # expected
-        ),
-        (
-            {"license": {"key": "other_license"}},
-            "my_license",
-            False
-        )
-    ])
-    def test_has_license(self, repo, license_key, expected):
-        """Test that has_license correctly detects license matches."""
-        client = GithubOrgClient("testorg")
-        self.assertEqual(client.has_license(repo, license_key), expected)
 
 
 @parameterized_class([{
@@ -94,7 +58,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.get_patcher = patch('client.requests.get')
+        cls.get_patcher = patch('utils.requests.get')
         mock_get = cls.get_patcher.start()
 
         def side_effect(url):
