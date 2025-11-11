@@ -85,7 +85,7 @@ class TestGithubOrgClient(unittest.TestCase):
         "org_payload": org_payload,
         "repos_payload": repos_payload,
         "expected_repos": expected_repos,
-        "apache2_repos": apache2_repos,
+        "apache2_repos": apache2_repos
     }
 ])
 class TestIntegrationGithubOrgClient(unittest.TestCase):
@@ -124,6 +124,6 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         """Test public_repos with license filter returns correct repos."""
         client = GithubOrgClient("google")
         self.assertEqual(client.public_repos("apache-2.0"), self.apache2_repos)
-        
+
 if __name__ == "__main__":
     unittest.main()
