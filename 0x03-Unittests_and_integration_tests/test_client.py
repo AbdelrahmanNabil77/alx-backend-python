@@ -92,26 +92,21 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up mock for requests.get"""
-        cls.get_patcher = patch('client.requests.get')
-        cls.mock_get = cls.get_patcher.start()
+        cls.get_patcher = patch("requests.get")
+        mock_get = cls.get_patcher.start()
 
         def side_effect(url):
-            class MockResponse:
-                @staticmethod
-                def json():
-                    if url == "https://api.github.com/orgs/google":
-                        return cls.org_payload
-                    elif url == "https://api.github.com/orgs/google/repos":
-                        return cls.repos_payload
-                    return {}
+            mock_response = unittest.mock.Mock()
+            mock_response.raise_for_status = unittest.mock.Mock()
+            if url == "https://api.github.com/orgs/google":
+                mock_response.json.return_value = cls.org_payload
+            elif url == "https://api.github.com/orgs/google/repos":
+                mock_response.json.return_value = cls.repos_payload
+            else:
+                mock_response.json.return_value = {}
+            return mock_response
 
-                @staticmethod
-                def raise_for_status():
-                    pass
-
-            return MockResponse()
-
-        cls.mock_get.side_effect = side_effect
+        mock_get.side_effect = side_effect
 
     @classmethod
     def tearDownClass(cls):
@@ -127,7 +122,6 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         """Test public_repos with license filter returns correct repos."""
         client = GithubOrgClient("google")
         self.assertEqual(client.public_repos("apache-2.0"), self.apache2_repos)
-
 
 if __name__ == "__main__":
     unittest.main()
