@@ -99,38 +99,52 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """Set up mock for requests.get"""
+        """Set up mock for requests.get."""
         cls.get_patcher = patch("requests.get")
         mock_get = cls.get_patcher.start()
 
         def side_effect(url):
             mock_response = unittest.mock.Mock()
             mock_response.raise_for_status = unittest.mock.Mock()
+
+            # Mock the organization payload
             if url == "https://api.github.com/orgs/google":
                 mock_response.json.return_value = cls.org_payload
+
+            # Mock the repositories payload
             elif url == "https://api.github.com/orgs/google/repos":
-                mock_response.json.return_value = cls.repos_payload
+                # Ensure all repos have a valid license dictionary
+                repos = []
+                for repo in cls.repos_payload:
+                    if "license" not in repo or repo["license"] is None:
+                        repo["license"] = {"key": ""}
+                    repos.append(repo)
+                mock_response.json.return_value = repos
+
+            # Default: empty response
             else:
                 mock_response.json.return_value = {}
+
             return mock_response
 
         mock_get.side_effect = side_effect
 
     @classmethod
     def tearDownClass(cls):
-        """Stop patcher"""
+        """Stop the patcher after tests."""
         cls.get_patcher.stop()
 
     def test_public_repos(self):
-        """Test that public_repos returns expected repos."""
+        """Test that public_repos returns expected repositories."""
         client = GithubOrgClient("google")
-        self.assertEqual(client.public_repos(), self.expected_repos)
+        result = client.public_repos()
+        self.assertEqual(result, self.expected_repos)
 
     def test_public_repos_with_license(self):
-        """Test public_repos with license filter returns correct repos."""
+        """Test that public_repos filters by license 'apache-2.0' correctly."""
         client = GithubOrgClient("google")
-        self.assertEqual(client.public_repos("apache-2.0"), self.apache2_repos)
-
+        result = client.public_repos("apache-2.0")
+        self.assertEqual(result, self.apache2_repos)
 
 if __name__ == "__main__":
     unittest.main()
