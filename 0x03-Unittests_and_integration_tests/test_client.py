@@ -78,6 +78,15 @@ class TestGithubOrgClient(unittest.TestCase):
                 "https://api.github.com/orgs/google/repos"
             )
 
+    # ✅ ADD THIS REQUIRED TEST
+    @parameterized.expand([
+        ({"license": {"key": "my_license"}}, "my_license", True),
+        ({"license": {"key": "other_license"}}, "my_license", False),
+    ])
+    def test_has_license(self, repo, license_key, expected):
+        """Test GithubOrgClient.has_license correctly detects license key."""
+        self.assertEqual(GithubOrgClient.has_license(repo, license_key), expected)
+
 
 @parameterized_class([
     {
