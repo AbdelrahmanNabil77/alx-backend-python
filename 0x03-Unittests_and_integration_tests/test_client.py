@@ -6,7 +6,6 @@ from unittest.mock import patch, PropertyMock
 from parameterized import parameterized, parameterized_class
 from client import GithubOrgClient
 
-
 # Inline fixtures
 org_payload = {
     "login": "google",
@@ -66,9 +65,9 @@ class TestGithubOrgClient(unittest.TestCase):
         expected_repos = ["repo1", "repo2", "repo3"]
 
         with patch.object(
-            GithubOrgClient,
-            "_public_repos_url",
-            new_callable=PropertyMock
+                GithubOrgClient,
+                "_public_repos_url",
+                new_callable=PropertyMock
         ) as mock_url:
             mock_url.return_value = "https://api.github.com/orgs/google/repos"
 
@@ -80,36 +79,24 @@ class TestGithubOrgClient(unittest.TestCase):
             )
 
 
-@parameterized_class([{
-    "org_payload": org_payload,
-    "repos_payload": repos_payload,
-    "expected_repos": expected_repos,
-    "apache2_repos": apache2_repos
-}])
+@parameterized_class([
+    {
+        "org_payload": org_payload,
+        "repos_payload": repos_payload,
+        "expected_repos": expected_repos,
+        "apache2_repos": apache2_repos,
+    }
+])
 class TestIntegrationGithubOrgClient(unittest.TestCase):
     """Integration tests for GithubOrgClient.public_repos."""
 
     @classmethod
     def setUpClass(cls):
         """Set up mock for requests.get"""
-        cls.get_patcher = patch('client.requests.get')
-        cls.mock_get = cls.get_patcher.start()
         cls.get_patcher = patch("requests.get")
         mock_get = cls.get_patcher.start()
 
         def side_effect(url):
-            class MockResponse:
-                @staticmethod
-                def json():
-                    if url == "https://api.github.com/orgs/google":
-                        return cls.org_payload
-                    elif url == "https://api.github.com/orgs/google/repos":
-                        return cls.repos_payload
-                    return {}
-
-                @staticmethod
-                def raise_for_status():
-                    pass
             mock_response = unittest.mock.Mock()
             mock_response.raise_for_status = unittest.mock.Mock()
             if url == "https://api.github.com/orgs/google":
@@ -120,9 +107,6 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
                 mock_response.json.return_value = {}
             return mock_response
 
-            return MockResponse()
-
-        cls.mock_get.side_effect = side_effect
         mock_get.side_effect = side_effect
 
     @classmethod
